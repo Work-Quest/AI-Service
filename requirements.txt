@@ -1,0 +1,10 @@
+flask==3.1.0
+flask-cors==5.0.1
+psycopg2-binary==2.9.10
+pandas==2.2.3
+joblib==1.4.2
+scikit-learn==1.6.1
+
+# Optional (only needed if you use OpenAI feedback generation)
+openai==1.66.3
+

@@ -25,8 +25,7 @@ from repository.kmeans_repository import fetch_active_model_blob
 from repository.user_feature_repository import fetch_member_feature_row
 
 app = Flask(__name__)
-CORS(app)  # TODO: configure allowed origins for production (or disable CORS entirely)
-
+CORS(app)
 
 # -------------------------
 # Model loading (from DB)
@@ -405,5 +404,4 @@ def feedback_stub():
         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    # TODO: configure host/port via env vars for container deployments
     app.run(debug=True)
