@@ -284,6 +284,7 @@ def generate_feedback(
     work_load_per_day,
     team_work,
     work_speed,
+    diligence,
     overall_quality_score,
 ) -> str:
     """
@@ -316,25 +317,47 @@ def generate_feedback(
     }
 
     sorted_metrics = sorted(metrics.items(), key=lambda x: x[1], reverse=True)
-    strengths = [name for name, _ in sorted_metrics[:2]]
-    improvements = [name for name, _ in sorted_metrics[-2:]]
+
 
     analyzed_data = {
         "Workload": work_load_list,
         "Teamwork": metrics["Teamwork"],
         "Speed": speed_list,
         "Quality": metrics["Quality"],
-        "Strengths": strengths,
-        "Improvements": improvements,
+        "diligence": diligence,
         "Best Task": work_category,
         "Role": role,
     }
 
-    prompt = f"""With this analyzed data {analyzed_data}, act like you're talking directly to {user_name} after the project end and give unbiased personal feedback.
-Use their name and speak casually. Highlight their strengths (especially their best work category: {work_category}).
-Mention their highest performance areas without giving exact numeric scores.
-Point out areas for improvement based on weaker aspects.
-Keep a motivational tone and end with encouragement. Include time management advice too."""
+    prompt = f"""
+        With the following analyzed data: {analyzed_data}, act as if you are speaking directly to {user_name} after the project has ended and provide realistic, unbiased personal feedback.
+
+        Use a casual and friendly tone and address the user by their name.
+        
+        Metric meanings:
+        - Workload: number of tasks assigned per day
+        - Teamwork: teamwork t-score out of 100
+        - Speed: average time (in minutes) taken to complete each task per day
+        - Diligence: productivity t-score out of 100
+        
+        Instructions:
+        - Be honest and realistic. Do NOT sugarcoat the feedback.
+        - If the user performed poorly, clearly say so.
+        - If the user had many days with zero progress or very low scores, the feedback should be critical.
+        - Only give encouragement if it is justified by their performance.
+        - Highlight strengths only if there is clear evidence in the data.
+        - Mention their best work category: {work_category}.
+        - Do NOT include exact numbers or scores.
+        - Point out specific weaknesses and what they should improve.
+
+        
+        Structure the feedback roughly as:
+        1. Friendly opening addressing the user
+        2. Strengths and best areas
+        3. Areas for improvement
+        4. Time management advice
+        5. Encouraging closing message
+"""
 
     try:
         response = client.chat.completions.create(
@@ -378,6 +401,7 @@ def feedback_stub():
         work_category = member_row.get("strength", "Unknown Category")
         work_speed = member_row.get("work_speed", "[]")
         overall_quality_score = member_row.get("work_quality", 0.0)
+        diligence = member_row.get("diligence", 0.0)
         feedback = generate_feedback(
             user_name=user_name,
             role=assigned_role,
@@ -385,7 +409,8 @@ def feedback_stub():
             work_load_per_day=work_load_per_day,
             team_work=team_work,
             work_speed=work_speed,
-            overall_quality_score=overall_quality_score
+            overall_quality_score=overall_quality_score,
+            diligence=diligence
         )
 
         return jsonify({
@@ -395,7 +420,8 @@ def feedback_stub():
             "team_work" : team_work,
             "work_category" : work_category,
             "work_speed" : work_speed,
-            "overall_quality_score" : overall_quality_score,        
+            "overall_quality_score" : overall_quality_score,
+            "diligence" : diligence,
             "assigned_role": assigned_role,
             "feedback" : feedback
         })
