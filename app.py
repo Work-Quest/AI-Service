@@ -404,4 +404,6 @@ def feedback_stub():
         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Docker-friendly defaults: bind all interfaces and honor PORT if provided.
+    port = int(os.getenv("PORT") or "5000")
+    app.run(host="0.0.0.0", port=5000, debug=True)
