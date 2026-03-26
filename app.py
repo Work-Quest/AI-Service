@@ -339,6 +339,7 @@ def generate_feedback(
         - Teamwork: teamwork t-score out of 100
         - Speed: average time (in minutes) taken to complete each task per day
         - Diligence: productivity t-score out of 100
+        - Quality: quality out of 5
         
         Instructions:
         - Be honest and realistic. Do NOT sugarcoat the feedback.
